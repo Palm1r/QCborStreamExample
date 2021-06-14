@@ -23,8 +23,10 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+public slots:
     void addDevice(DeviceInfo newDevice);
 signals:
+    void modelChanged();
 
 private:
     QList<DeviceInfo> m_deviceList;

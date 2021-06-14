@@ -1,5 +1,6 @@
 #include "devicesHub.h"
 
+#include <QCborStreamReader>
 #include <QCborStreamWriter>
 
 namespace {
@@ -16,6 +17,8 @@ DevicesHub::DevicesHub(QObject *parent)
             &HubTcpServer::deviceConnected,
             this,
             &DevicesHub::acceptConnection);
+
+    connect(this, &DevicesHub::regNewDevice, m_deviceList.get(), &DeviceModel::addDevice);
 }
 
 void DevicesHub::findDevices()
@@ -40,37 +43,48 @@ void DevicesHub::sendBroadcastData(QByteArray data)
 
 void DevicesHub::acceptConnection(qintptr newSocket)
 {
-    DeviceInfo device;
     auto in_socket = std::make_shared<QTcpSocket>();
     in_socket->setSocketDescriptor(newSocket);
     qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
-    device.ip = in_socket->peerAddress();
 
-    connect(in_socket.get(), &QTcpSocket::readyRead, [in_socket]() {
+    connect(in_socket.get(), &QTcpSocket::readyRead, this, [in_socket, this]() {
+        DeviceInfo device;
+        device.id = "test"; /*in_socket->peerName();*/
+        device.ip = in_socket->peerAddress();
+        device.messageCount++;
+
         auto bytearray = in_socket->readAll();
         qDebug() << "get data" << bytearray;
         in_socket->close();
+
+        QCborStreamReader reader(bytearray);
+        if (reader.lastError() != QCborError::NoError || !reader.isMap())
+            return;
+        if (!reader.isLengthKnown() || reader.length() != 3)
+            return;
+
+        QVariantMap map;
+        reader.enterContainer();
+
+        int i = 0;
+        QString key;
+        QString value;
+
+        while (reader.lastError() == QCborError::NoError && reader.hasNext()) {
+            if (i == 0) {
+                key = reader.readString().data;
+                ++i;
+            } else {
+                value = reader.readString().data;
+                map[key] = value;
+                i = 0;
+            }
+            reader.next();
+        }
+        reader.leaveContainer();
+        device.id = map["id"].toString();
+        emit regNewDevice(device);
     });
-
-    //    in_socket->close();
-    //    qDebug() << "server accept connection";
-    //    tcpServerConnection = m_hubTcpServer->nextPendingConnection();
-    //    if (!tcpServerConnection) {
-    //        qDebug("Error: got invalid pending connection!");
-    //        return;
-    //    }
-    //    qDebug() << "ip:port" << tcpServerConnection->peerAddress() << ":"
-    //             << tcpServerConnection->peerPort();
-
-    //    connect(tcpServerConnection, &QIODevice::readyRead, this, &DevicesHub::readyToRead);
-    //    //    connect(tcpServerConnection, &QAbstractSocket::errorOccurred, this, &Dialog::displayError);
-    //    connect(tcpServerConnection,
-    //            &QTcpSocket::disconnected,
-    //            tcpServerConnection,
-    //            &QTcpSocket::deleteLater);
-
-    //    //    serverStatusLabel->setText(tr("Accepted connection"));
-    //    m_hubTcpServer->close();
 }
 
 void DevicesHub::readyToRead() {}

@@ -39,6 +39,7 @@ public:
     const std::shared_ptr<DeviceModel> &deviceList() const;
 
 signals:
+    void regNewDevice(DeviceInfo info);
 
 public slots:
     void acceptConnection(qintptr newSocket);

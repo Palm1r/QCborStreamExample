@@ -7,7 +7,7 @@ Window {
     width: 640
     height: 480
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("Network Test Project")
 
     Column {
         anchors.fill: parent
@@ -28,6 +28,19 @@ Window {
             radius: width / 2
             color: RootController.deviceType() === RootController.Server ?
                        "blue" : "green"
+        }
+
+        ListView {
+            height: childrenRect.height
+            width: parent.width
+            model: RootController.deviceModel
+            spacing: 50
+            orientation: ListView.Vertical
+            delegate: Rectangle {
+                width: parent.width
+                height: 100
+                color: "red"
+            }
         }
     }
 }

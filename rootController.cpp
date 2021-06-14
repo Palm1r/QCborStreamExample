@@ -8,6 +8,10 @@ RootController::RootController(QObject *parent)
     , m_type(Server)
 {
     m_device = std::make_unique<Device>();
+    connect(m_hub->deviceList().get(),
+            &DeviceModel::modelChanged,
+            this,
+            &RootController::deviceModelChanged);
 }
 
 void RootController::findDevices()

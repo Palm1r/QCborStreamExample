@@ -44,6 +44,7 @@ QHash<int, QByteArray> DeviceModel::roleNames() const
 
 void DeviceModel::addDevice(DeviceInfo newDevice)
 {
+    qDebug() << "add device" << newDevice.id << newDevice.ip << newDevice.messageCount;
     for (const auto &device : qAsConst(m_deviceList)) {
         if (device.id == newDevice.id) {
             return;
