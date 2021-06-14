@@ -41,7 +41,7 @@ public:
 signals:
 
 public slots:
-    void acceptConnection();
+    void acceptConnection(qintptr newSocket);
     void readyToRead();
 
 private:

@@ -14,12 +14,10 @@ DevicesHub::DevicesHub(QObject *parent)
 {
     //    m_hubTcpServer->listen(QHostAddress::Any, 56666);
     //    connect(m_hubTcpServer.get(), &HubTcpServer::newConnection, this, &DevicesHub::acceptConnection);
-    connect(m_hubTcpServer.get(), &HubTcpServer::deviceConnected, [this](qintptr newSocket) {
-        auto in_socket = std::make_unique<QTcpSocket>();
-        in_socket->setSocketDescriptor(newSocket);
-        qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
-        in_socket->close();
-    });
+    connect(m_hubTcpServer.get(),
+            &HubTcpServer::deviceConnected,
+            this,
+            &DevicesHub::acceptConnection);
 }
 
 void DevicesHub::findDevices()
@@ -42,8 +40,12 @@ void DevicesHub::sendBroadcastData(QByteArray data)
     m_udpSocket->writeDatagram(data, QHostAddress::Broadcast, broadcastPort);
 }
 
-void DevicesHub::acceptConnection()
+void DevicesHub::acceptConnection(qintptr newSocket)
 {
+    auto in_socket = std::make_unique<QTcpSocket>();
+    in_socket->setSocketDescriptor(newSocket);
+    qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
+    in_socket->close();
     //    qDebug() << "server accept connection";
     //    tcpServerConnection = m_hubTcpServer->nextPendingConnection();
     //    if (!tcpServerConnection) {

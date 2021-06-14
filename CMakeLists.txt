@@ -16,10 +16,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Network REQUIRED)
 
 set(PROJECT_SOURCES
     main.cpp
-    connectionManager.h
-    connectionManager.cpp
-    deviceManager.h
-    deviceManager.cpp
     device.h
     device.cpp
     rootController.h

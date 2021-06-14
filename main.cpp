@@ -1,5 +1,3 @@
-#include "deviceManager.h"
-
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -24,14 +22,6 @@ int main(int argc, char *argv[])
                 QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection);
-    qmlRegisterSingletonType<DeviceManager>("Palm1r.networkProject.DeviceManager",
-                                            1,
-                                            0,
-                                            "DeviceManager",
-                                            [](QQmlEngine *, QJSEngine *) {
-                                                DeviceManager *deviceManager = new DeviceManager();
-                                                return deviceManager;
-                                            });
     qmlRegisterSingletonType<RootController>("Palm1r.networkProject.RootController",
                                              1,
                                              0,
