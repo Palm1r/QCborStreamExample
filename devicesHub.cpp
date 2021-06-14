@@ -12,9 +12,7 @@ DevicesHub::DevicesHub(QObject *parent)
     , m_hubTcpServer(std::make_unique<QTcpServer>())
 {
     m_hubTcpServer->listen(QHostAddress::Any, 56666);
-    connect(m_hubTcpServer.get(), &QTcpServer::newConnection, []() {
-        qDebug() << "server accept connection";
-    });
+    connect(m_hubTcpServer.get(), &QTcpServer::newConnection, this, &DevicesHub::acceptConnection);
 }
 
 void DevicesHub::findDevices()
@@ -36,3 +34,27 @@ void DevicesHub::sendBroadcastData(QByteArray data)
 {
     m_udpSocket->writeDatagram(data, QHostAddress::Broadcast, broadcastPort);
 }
+
+void DevicesHub::acceptConnection()
+{
+    qDebug() << "server accept connection";
+    tcpServerConnection = m_hubTcpServer->nextPendingConnection();
+    if (!tcpServerConnection) {
+        qDebug("Error: got invalid pending connection!");
+        return;
+    }
+    qDebug() << "ip:port" << tcpServerConnection->peerAddress() << ":"
+             << tcpServerConnection->peerPort();
+
+    connect(tcpServerConnection, &QIODevice::readyRead, this, &DevicesHub::readyToRead);
+    //    connect(tcpServerConnection, &QAbstractSocket::errorOccurred, this, &Dialog::displayError);
+    connect(tcpServerConnection,
+            &QTcpSocket::disconnected,
+            tcpServerConnection,
+            &QTcpSocket::deleteLater);
+
+    //    serverStatusLabel->setText(tr("Accepted connection"));
+    m_hubTcpServer->close();
+}
+
+void DevicesHub::readyToRead() {}

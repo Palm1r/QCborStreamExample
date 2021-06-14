@@ -3,17 +3,8 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include <QTcpSocket>
 #include <QUdpSocket>
-
-class HubTcpServer : public QTcpServer
-{
-public:
-    explicit HubTcpServer(QObject *parent = nullptr) { listen(QHostAddress::Any, 56666); };
-
-    // QTcpServer interface
-protected:
-    void incomingConnection(qintptr handle) override { qDebug() << "incoming"; };
-};
 
 class DevicesHub : public QObject
 {
@@ -27,9 +18,14 @@ public:
 
 signals:
 
+public slots:
+    void acceptConnection();
+    void readyToRead();
+
 private:
     std::unique_ptr<QUdpSocket> m_udpSocket;
     std::unique_ptr<QTcpServer> m_hubTcpServer;
+    QTcpSocket *tcpServerConnection = nullptr;
 };
 
 #endif // SERVER_H
