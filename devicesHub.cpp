@@ -9,7 +9,13 @@ constexpr int broadcastPort = 45454;
 DevicesHub::DevicesHub(QObject *parent)
     : QObject(parent)
     , m_udpSocket(std::make_unique<QUdpSocket>())
-{}
+    , m_hubTcpServer(std::make_unique<QTcpServer>())
+{
+    m_hubTcpServer->listen(QHostAddress::Any, 56666);
+    connect(m_hubTcpServer.get(), &QTcpServer::newConnection, []() {
+        qDebug() << "server accept connection";
+    });
+}
 
 void DevicesHub::findDevices()
 {

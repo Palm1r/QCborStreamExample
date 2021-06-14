@@ -3,6 +3,7 @@
 
 #include <QCborStreamReader>
 #include <QObject>
+#include <QTcpSocket>
 #include <QUdpSocket>
 
 class Device : public QObject
@@ -11,7 +12,6 @@ class Device : public QObject
 public:
     explicit Device(QObject *parent = nullptr);
 
-    void handleStream(QCborStreamReader &reader);
 private slots:
     void readBroadcastData();
 signals:
@@ -19,6 +19,10 @@ signals:
 private:
     std::unique_ptr<QUdpSocket> m_listenSocket;
     std::unique_ptr<QCborStreamReader> m_cborReader;
+
+    QHostAddress m_serverAdress;
+    quint16 m_serverPort;
+    QTcpSocket m_clientTcpSocket;
 };
 
 #endif // DEVICE_H

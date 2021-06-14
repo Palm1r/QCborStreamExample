@@ -7,21 +7,20 @@ Device::Device(QObject *parent)
 {
     m_listenSocket->bind(45454, QUdpSocket::ShareAddress);
     connect(m_listenSocket.get(), &QUdpSocket::readyRead, this, &Device::readBroadcastData);
+    connect(&m_clientTcpSocket, &QAbstractSocket::connected, []() {
+        qDebug() << "client connected";
+    });
 }
 
 void Device::readBroadcastData()
 {
-    //    qDebug() << "readBroadcast()";
     QByteArray data;
-    QHostAddress senderIp;
-    quint16 senderPort;
 
     while (m_listenSocket->hasPendingDatagrams()) {
         data.resize(int(m_listenSocket->pendingDatagramSize()));
-        if (m_listenSocket->readDatagram(data.data(), data.size(), &senderIp, &senderPort) == -1)
+        if (m_listenSocket->readDatagram(data.data(), data.size(), &m_serverAdress, &m_serverPort)
+            == -1)
             continue;
-
-        //        qDebug() << "recieved" << data.constData() << senderIp << senderPort;
 
         m_cborReader->addData(data);
 
@@ -49,6 +48,8 @@ void Device::readBroadcastData()
             m_cborReader->next();
         }
         m_cborReader->leaveContainer();
-        qDebug() << "map" << map;
+        qDebug() << "map" << map << m_serverAdress << m_serverPort;
     }
+
+    m_clientTcpSocket.connectToHost(m_serverAdress, 56666);
 }
