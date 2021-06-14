@@ -7,7 +7,7 @@ ConnectionManager::ConnectionManager(QObject *parent, Device *device)
     : QObject(parent)
     , m_device(device)
 {
-    broadcastSocket.bind(50000, QUdpSocket::ShareAddress);
+    broadcastSocket.bind(45454, QUdpSocket::ShareAddress);
     connect(&broadcastSocket, &QUdpSocket::readyRead, this, &ConnectionManager::readBroadcast);
 }
 
@@ -15,7 +15,7 @@ void ConnectionManager::startServer() {}
 
 void ConnectionManager::sendBroadcast(QByteArray datagram)
 {
-    broadcastSocket.writeDatagram(datagram, QHostAddress::Broadcast, 50000);
+    broadcastSocket.writeDatagram(datagram, QHostAddress::Broadcast, 45454);
 }
 
 void ConnectionManager::readBroadcast()
