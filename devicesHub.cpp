@@ -12,8 +12,6 @@ DevicesHub::DevicesHub(QObject *parent)
     , m_hubTcpServer(std::make_unique<HubTcpServer>())
     , m_deviceList(std::make_shared<DeviceModel>())
 {
-    //    m_hubTcpServer->listen(QHostAddress::Any, 56666);
-    //    connect(m_hubTcpServer.get(), &HubTcpServer::newConnection, this, &DevicesHub::acceptConnection);
     connect(m_hubTcpServer.get(),
             &HubTcpServer::deviceConnected,
             this,
@@ -42,10 +40,19 @@ void DevicesHub::sendBroadcastData(QByteArray data)
 
 void DevicesHub::acceptConnection(qintptr newSocket)
 {
-    auto in_socket = std::make_unique<QTcpSocket>();
+    DeviceInfo device;
+    auto in_socket = std::make_shared<QTcpSocket>();
     in_socket->setSocketDescriptor(newSocket);
     qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
-    in_socket->close();
+    device.ip = in_socket->peerAddress();
+
+    connect(in_socket.get(), &QTcpSocket::readyRead, [in_socket]() {
+        auto bytearray = in_socket->readAll();
+        qDebug() << "get data" << bytearray;
+        in_socket->close();
+    });
+
+    //    in_socket->close();
     //    qDebug() << "server accept connection";
     //    tcpServerConnection = m_hubTcpServer->nextPendingConnection();
     //    if (!tcpServerConnection) {

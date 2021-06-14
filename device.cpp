@@ -1,5 +1,7 @@
 #include "device.h"
 
+#include <QCborStreamWriter>
+
 Device::Device(QObject *parent)
     : QObject(parent)
     , m_listenSocket(std::make_unique<QUdpSocket>())
@@ -7,8 +9,21 @@ Device::Device(QObject *parent)
 {
     m_listenSocket->bind(45454, QUdpSocket::ShareAddress);
     connect(m_listenSocket.get(), &QUdpSocket::readyRead, this, &Device::readBroadcastData);
-    connect(&m_clientTcpSocket, &QAbstractSocket::connected, []() {
+    connect(&m_clientTcpSocket, &QAbstractSocket::connected, [this]() {
         qDebug() << "client connected";
+        QByteArray answerData;
+        {
+            QCborStreamWriter writer(&answerData);
+            writer.startMap(3);
+            writer.append("type");
+            writer.append("client");
+            writer.append("id");
+            writer.append("un1");
+            writer.append("command");
+            writer.append("reg");
+            writer.endArray();
+        }
+        m_clientTcpSocket.write(answerData);
     });
 }
 
