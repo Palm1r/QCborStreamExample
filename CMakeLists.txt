@@ -16,15 +16,15 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Network REQUIRED)
 
 set(PROJECT_SOURCES
     main.cpp
-    device.h
-    device.cpp
-    rootController.h
-    rootController.cpp
-    devicesHub.h
-    devicesHub.cpp
-    deviceModel.h
-    deviceModel.cpp
     qml.qrc
+    src/device.h
+    src/device.cpp
+    src/rootController.h
+    src/rootController.cpp
+    src/devicesHub.h
+    src/devicesHub.cpp
+    src/deviceModel.h
+    src/deviceModel.cpp
     )
 
 add_executable(NetworkTestProject

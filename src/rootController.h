@@ -25,7 +25,6 @@ public slots:
     int deviceType();
 
 signals:
-
     void deviceModelChanged();
 
 private:
