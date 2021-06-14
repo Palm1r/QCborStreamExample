@@ -1,6 +1,7 @@
+#include "deviceManager.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "deviceManager.h"
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
@@ -13,12 +14,17 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreated,
+        &app,
+        [url](QObject *obj, const QUrl &objUrl) {
+            if (!obj && url == objUrl)
+                QCoreApplication::exit(-1);
+        },
+        Qt::QueuedConnection);
     engine.load(url);
+    engine.rootContext()->setContextProperty("_deviceManager", &deviceManager);
 
     return app.exec();
 }

@@ -20,6 +20,8 @@ set(PROJECT_SOURCES
     connectionManager.cpp
     deviceManager.h
     deviceManager.cpp
+    device.h
+    device.cpp
     qml.qrc
     )
 
