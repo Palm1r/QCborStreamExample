@@ -1,10 +1,12 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef DEVICEHUB_H
+#define DEVICEHUB_H
 
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QUdpSocket>
+
+#include "deviceModel.h"
 
 class HubTcpServer : public QTcpServer
 {
@@ -14,7 +16,14 @@ public:
 
     // QTcpServer interface
 protected:
-    void incomingConnection(qintptr handle) override { qDebug() << "incoming"; };
+    void incomingConnection(qintptr handle) override
+    {
+        qDebug() << "incoming";
+        emit deviceConnected(handle);
+    };
+
+signals:
+    void deviceConnected(qintptr newSocket);
 };
 
 class DevicesHub : public QObject
@@ -27,6 +36,8 @@ public:
 
     void sendBroadcastData(QByteArray data);
 
+    const std::shared_ptr<DeviceModel> &deviceList() const;
+
 signals:
 
 public slots:
@@ -36,7 +47,7 @@ public slots:
 private:
     std::unique_ptr<QUdpSocket> m_udpSocket;
     std::unique_ptr<HubTcpServer> m_hubTcpServer;
-    QTcpSocket *tcpServerConnection = nullptr;
+    std::shared_ptr<DeviceModel> m_deviceList;
 };
 
-#endif // SERVER_H
+#endif // DEVICEHUB_H

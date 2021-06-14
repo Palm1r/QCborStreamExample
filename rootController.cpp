@@ -20,3 +20,8 @@ int RootController::deviceType()
 {
     return m_type;
 }
+
+DeviceModel *RootController::deviceModel() const
+{
+    return m_hub->deviceList().get();
+}

@@ -10,17 +10,23 @@
 class RootController : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(DeviceModel *deviceModel READ deviceModel NOTIFY deviceModelChanged)
 public:
     enum DeviceType { Server, Client };
     Q_ENUM(DeviceType)
 
     explicit RootController(QObject *parent = nullptr);
 
+    DeviceModel *deviceModel() const;
+
 public slots:
     void findDevices();
     int deviceType();
 
 signals:
+
+    void deviceModelChanged();
 
 private:
     std::unique_ptr<DevicesHub> m_hub;
