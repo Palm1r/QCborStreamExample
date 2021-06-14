@@ -22,6 +22,8 @@ set(PROJECT_SOURCES
     deviceManager.cpp
     device.h
     device.cpp
+    rootController.h
+    rootController.cpp
     qml.qrc
     )
 

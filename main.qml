@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import Palm1r.networkProject.DeviceManager 1.0
 
 Window {
     width: 640
@@ -17,7 +18,7 @@ Window {
             height: width / 2
             text: "find devices"
             onClicked: {
-                _deviceManager.startFindDevices()
+                DeviceManager.startFindDevices()
             }
         }
     }

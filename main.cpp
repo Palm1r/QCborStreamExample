@@ -8,8 +8,6 @@ int main(int argc, char *argv[])
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    DeviceManager deviceManager;
-
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
@@ -23,8 +21,15 @@ int main(int argc, char *argv[])
                 QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection);
+    qmlRegisterSingletonType<DeviceManager>("Palm1r.networkProject.DeviceManager",
+                                            1,
+                                            0,
+                                            "DeviceManager",
+                                            [](QQmlEngine *, QJSEngine *) -> QObject * {
+                                                DeviceManager *deviceManager = new DeviceManager();
+                                                return deviceManager;
+                                            });
     engine.load(url);
-    engine.rootContext()->setContextProperty("_deviceManager", &deviceManager);
 
     return app.exec();
 }
