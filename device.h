@@ -1,28 +1,24 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <QHostAddress>
+#include <QCborStreamReader>
 #include <QObject>
+#include <QUdpSocket>
 
-class ConnectionManager;
 class Device : public QObject
 {
     Q_OBJECT
 public:
-    enum DeviceType { Server, Client };
-    Q_ENUM(DeviceType)
+    explicit Device(QObject *parent = nullptr);
 
-    explicit Device(QObject *parent = nullptr, DeviceType type = Client);
-
+    void handleStream(QCborStreamReader &reader);
+private slots:
+    void readBroadcastData();
 signals:
 
 private:
-    DeviceType m_type;
-    int m_broadcastPort;
-    int m_id;
-    QHostAddress m_ip;
-
-    //    ConnectionManager *m_connectionManager;
+    std::unique_ptr<QUdpSocket> m_listenSocket;
+    std::unique_ptr<QCborStreamReader> m_cborReader;
 };
 
 #endif // DEVICE_H

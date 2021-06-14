@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
     device.cpp
     rootController.h
     rootController.cpp
+    devicesHub.h
+    devicesHub.cpp
     qml.qrc
     )
 

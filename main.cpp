@@ -1,7 +1,10 @@
 #include "deviceManager.h"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+
+#include "rootController.h"
 
 int main(int argc, char *argv[])
 {
@@ -25,10 +28,18 @@ int main(int argc, char *argv[])
                                             1,
                                             0,
                                             "DeviceManager",
-                                            [](QQmlEngine *, QJSEngine *) -> QObject * {
+                                            [](QQmlEngine *, QJSEngine *) {
                                                 DeviceManager *deviceManager = new DeviceManager();
                                                 return deviceManager;
                                             });
+    qmlRegisterSingletonType<RootController>("Palm1r.networkProject.RootController",
+                                             1,
+                                             0,
+                                             "RootController",
+                                             [](QQmlEngine *, QJSEngine *) {
+                                                 auto rootController = new RootController();
+                                                 return rootController;
+                                             });
     engine.load(url);
 
     return app.exec();
