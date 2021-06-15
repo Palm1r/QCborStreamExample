@@ -4,6 +4,8 @@ import QtQuick.Controls 2.15
 import Palm1r.networkProject.RootController 1.0
 
 Window {
+   id: root
+
     width: 640
     height: 480
     visible: true
@@ -14,9 +16,16 @@ Window {
         spacing: 20
 
         HubButton {
+            id: serverButton
+
             buttonColor: "lightblue"
             buttonText: "Start server"
-            onButtonClicked: RootController.findDevices()
+            onButtonClicked: {
+                opacity = 0.0
+                deviceList.opacity = 1.0
+                RootController.findDevices()
+            }
+            Behavior on opacity {NumberAnimation{duration: 250}}
         }
 
         HubButton {
@@ -39,55 +48,39 @@ Window {
         }
     }
 
-    Column {
-        anchors.fill: parent
+    ListView {
+        id: deviceList
 
-        ListView {
+        anchors{
+            fill: parent
+            margins: 50
+        }
+        z: -1
+        opacity: 0.0
+        model: RootController.deviceModel //5
+        spacing: 20
+        delegate: Rectangle {
+            width: childrenRect.width
             height: childrenRect.height
-            width: parent.width
-            model: RootController.deviceModel
-            spacing: 50
-            orientation: ListView.Vertical
-            delegate: Rectangle {
-                width: parent.width
-                height: 100
-                color: "red"
+            color: "lightblue"
+            radius: width / 10
+            border.width: 1
+            border.color: Qt.darker(color)
+
+            Column {
+                padding: 20
+                spacing: 20
+
+                Text {
+                    text: deviceId
+                }
+                Text {
+                    text: deviceIp
+                }
+                Text {
+                    text: deviceMessageCount
+                }
             }
         }
     }
-
-//    Column {
-//        anchors.fill: parent
-//        spacing: 50
-
-//        Button {
-//            width: parent.width / 6
-//            height: width / 2
-//            text: "find devices"
-//            onClicked: {
-//                RootController.findDevices()
-//            }
-//        }
-
-//        Rectangle {
-//            width: 30
-//            height: width
-//            radius: width / 2
-//            color: RootController.deviceType() === RootController.Server ?
-//                       "blue" : "green"
-//        }
-
-//        ListView {
-//            height: childrenRect.height
-//            width: parent.width
-//            model: RootController.deviceModel
-//            spacing: 50
-//            orientation: ListView.Vertical
-//            delegate: Rectangle {
-//                width: parent.width
-//                height: 100
-//                color: "red"
-//            }
-//        }
-//    }
 }

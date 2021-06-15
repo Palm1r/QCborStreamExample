@@ -4,9 +4,12 @@
 #include <QObject>
 
 #include <QCborStreamReader>
-#include <QTcpSocket>
+#include <QHostAddress>
 #include <QTimer>
-#include <QUdpSocket>
+
+class QTcpSocket;
+class QTimer;
+class QUdpSocket;
 
 class Device : public QObject
 {
@@ -28,7 +31,7 @@ private slots:
     void sendDeviceData();
 
 private:
-    QString m_id = "unique1";
+    QString m_id;
     std::unique_ptr<QUdpSocket> m_listenSocket;
     std::unique_ptr<QCborStreamReader> m_cborReader;
     std::unique_ptr<QTcpSocket> m_clientTcpSocket;

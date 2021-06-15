@@ -49,15 +49,16 @@ void DeviceModel::addDevice(const DeviceInfo &newDevice)
             return;
         }
     }
-    qDebug() << "add device" << newDevice.id << newDevice.ip << newDevice.messageCount;
 
     beginInsertRows(QModelIndex(), m_deviceList.size(), m_deviceList.size());
     m_deviceList.push_back({newDevice.id, newDevice.ip, newDevice.messageCount});
     endInsertRows();
+    emit modelChanged();
 }
 
 void DeviceModel::addDeviceMessage(const QString &id)
 {
+    emit layoutAboutToBeChanged();
     for (int i = 0; i < m_deviceList.size(); ++i) {
         if (m_deviceList.at(i).id == id) {
             m_deviceList[i].messageCount++;
@@ -65,4 +66,5 @@ void DeviceModel::addDeviceMessage(const QString &id)
             break;
         }
     }
+    emit layoutChanged();
 }

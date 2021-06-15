@@ -17,7 +17,6 @@ RootController::RootController(QObject *parent)
 
 void RootController::findDevices()
 {
-    qDebug() << "find devices";
     m_hub->findDevices();
 }
 

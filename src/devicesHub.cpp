@@ -86,7 +86,6 @@ void DevicesHub::acceptConnection(qintptr newSocket)
             }
             reader->next();
         }
-        qDebug() << "get map" << map;
         reader->leaveContainer();
         if (map["type"] == "client" && map["command"] == "reg") {
             device.id = map["id"].toString();

@@ -3,6 +3,10 @@
 #include <QCborStreamWriter>
 #include <QDate>
 
+#include <QTcpSocket>
+#include <QTimer>
+#include <QUdpSocket>
+
 namespace {
 constexpr int udpSocketPort = 45454;
 
@@ -42,7 +46,6 @@ Device::Device(QObject *parent)
     m_listenSocket->bind(udpSocketPort, QUdpSocket::ShareAddress);
     connect(m_listenSocket.get(), &QUdpSocket::readyRead, this, &Device::readBroadcastData);
     connect(m_clientTcpSocket.get(), &QAbstractSocket::connected, this, [this]() {
-        qDebug() << "client connected";
         QByteArray data;
         if (m_deviceState == DeviceState::Registration) {
             fillRegData(m_id, data);
@@ -54,7 +57,6 @@ Device::Device(QObject *parent)
         if (!m_deviceDataSender.isActive()) {
             m_deviceDataSender.start();
         }
-        qDebug() << "send data from device";
     });
 
     m_deviceDataSender.setInterval(3000);
@@ -106,7 +108,6 @@ void Device::readBroadcastData()
             m_cborReader->next();
         }
         m_cborReader->leaveContainer();
-        qDebug() << "map" << map;
 
         if (map["type"] == "server" && map["command"] == "find") {
             m_deviceState = DeviceState::Registration;
