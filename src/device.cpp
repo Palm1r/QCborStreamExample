@@ -10,6 +10,20 @@
 namespace {
 constexpr int udpSocketPort = 45454;
 
+/*
+ * Protocol is defined as follows, using the CBOR Data Definition Language:
+ *  Simplified diagram
+ *  protocol    = [
+ *     type
+ *     id,
+ *     command,
+ *     data,
+ *     listenport
+ *  ]
+ *  type        = server / client
+ *  command     = reg / deviceData / find
+ */
+
 void fillRegData(const QString &id, QByteArray &data)
 {
     QCborStreamWriter writer(&data);
