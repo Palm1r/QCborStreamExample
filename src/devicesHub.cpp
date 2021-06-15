@@ -3,11 +3,6 @@
 #include <QCborStreamReader>
 #include <QCborStreamWriter>
 
-namespace {
-constexpr quint16 broadcastPort = 45454;
-constexpr quint16 tcpListenPort = 56666;
-}
-
 DevicesHub::DevicesHub(QObject *parent)
     : QObject(parent)
     , m_udpSocket(std::make_unique<QUdpSocket>())
@@ -20,6 +15,7 @@ DevicesHub::DevicesHub(QObject *parent)
             &DevicesHub::acceptConnection);
 
     connect(this, &DevicesHub::regNewDevice, m_deviceList.get(), &DeviceModel::addDevice);
+    connect(this, &DevicesHub::newMessageFrom, m_deviceList.get(), &DeviceModel::addDeviceMessage);
 }
 
 void DevicesHub::findDevices()
@@ -48,13 +44,10 @@ void DevicesHub::acceptConnection(qintptr newSocket)
 {
     auto in_socket = std::make_shared<QTcpSocket>();
     in_socket->setSocketDescriptor(newSocket);
-//    qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
 
     connect(in_socket.get(), &QTcpSocket::readyRead, this, [in_socket, this]() {
         DeviceInfo device;
-//        device.id = "test"; /*in_socket->peerName();*/
         device.ip = in_socket->peerAddress();
-//        device.messageCount++;
 
         QCborStreamReader reader(in_socket->readAll());
         in_socket->close();
@@ -76,7 +69,11 @@ void DevicesHub::acceptConnection(qintptr newSocket)
                 key = reader.readString().data;
                 ++i;
             } else {
-                value = reader.readString().data;
+                if (key == "data") {
+                    value = reader.toUnsignedInteger();
+                } else {
+                    value = reader.readString().data;
+                }
                 map[key] = value;
                 i = 0;
             }
@@ -84,12 +81,15 @@ void DevicesHub::acceptConnection(qintptr newSocket)
         }
         qDebug() << "get map" << map;
         reader.leaveContainer();
-        device.id = map["id"].toString();
-        emit regNewDevice(device);
+        if (map["type"] == "client" && map["command"] == "reg") {
+            device.id = map["id"].toString();
+            emit regNewDevice(device);
+        }
+        if (map["type"] == "client" && map["command"] == "deviceData") {
+            emit newMessageFrom(map["id"].toString());
+        }
     });
 }
-
-void DevicesHub::readyToRead() {}
 
 const std::shared_ptr<DeviceModel> &DevicesHub::deviceList() const
 {

@@ -25,6 +25,23 @@ Window {
         }
     }
 
+    Column {
+        anchors.fill: parent
+
+        ListView {
+            height: childrenRect.height
+            width: parent.width
+            model: RootController.deviceModel
+            spacing: 50
+            orientation: ListView.Vertical
+            delegate: Rectangle {
+                width: parent.width
+                height: 100
+                color: "red"
+            }
+        }
+    }
+
 //    Column {
 //        anchors.fill: parent
 //        spacing: 50

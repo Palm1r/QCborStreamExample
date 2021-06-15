@@ -8,19 +8,20 @@
 
 #include "deviceModel.h"
 
+namespace {
+constexpr quint16 tcpListenPort = 56666;
+constexpr quint16 broadcastPort = 45454;
+} // namespace
+
 class HubTcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit HubTcpServer(QObject *parent = nullptr) { listen(QHostAddress::Any, 56666); };
+    explicit HubTcpServer(QObject *parent = nullptr) { listen(QHostAddress::Any, tcpListenPort); };
 
     // QTcpServer interface
 protected:
-    void incomingConnection(qintptr handle) override
-    {
-        qDebug() << "incoming";
-        emit deviceConnected(handle);
-    };
+    void incomingConnection(qintptr handle) override { emit deviceConnected(handle); };
 
 signals:
     void deviceConnected(qintptr newSocket);
@@ -40,10 +41,10 @@ public:
 
 signals:
     void regNewDevice(DeviceInfo info);
+    void newMessageFrom(const QString &id);
 
 public slots:
     void acceptConnection(qintptr newSocket);
-    void readyToRead();
 
 private:
     std::unique_ptr<QUdpSocket> m_udpSocket;

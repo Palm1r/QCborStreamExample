@@ -44,12 +44,13 @@ QHash<int, QByteArray> DeviceModel::roleNames() const
 
 void DeviceModel::addDevice(DeviceInfo newDevice)
 {
-    qDebug() << "add device" << newDevice.id << newDevice.ip << newDevice.messageCount;
     for (const auto &device : qAsConst(m_deviceList)) {
         if (device.id == newDevice.id) {
             return;
         }
     }
+    qDebug() << "add device" << newDevice.id << newDevice.ip << newDevice.messageCount;
+
     beginInsertRows(QModelIndex(), m_deviceList.size(), m_deviceList.size());
     m_deviceList.push_back({newDevice.id, newDevice.ip, newDevice.messageCount});
     endInsertRows();
@@ -57,11 +58,11 @@ void DeviceModel::addDevice(DeviceInfo newDevice)
 
 void DeviceModel::addDeviceMessage(QString id)
 {
-    for (auto device : m_deviceList) {
-        if (device.id == id) {
-            device.messageCount++;
+    for (int i = 0; i < m_deviceList.size(); ++i) {
+        if (m_deviceList.at(i).id == id) {
+            m_deviceList[i].messageCount++;
             emit modelChanged();
-            return;
+            break;
         }
     }
 }

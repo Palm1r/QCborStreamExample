@@ -4,8 +4,8 @@
 #include <QCborStreamReader>
 #include <QObject>
 #include <QTcpSocket>
-#include <QUdpSocket>
 #include <QTimer>
+#include <QUdpSocket>
 
 class Device : public QObject
 {
@@ -17,7 +17,8 @@ public:
         Listen,
         Registration,
         SendingData
-    } m_deviceState = DeviceState::Listen;
+    } m_deviceState
+        = DeviceState::Listen;
 
     void setId(const QString &newId);
 

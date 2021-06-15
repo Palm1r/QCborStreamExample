@@ -5,7 +5,8 @@
 namespace {
 constexpr int udpSocketPort = 45454;
 
-void fillRegData(const QString& id, QByteArray& data) {
+void fillRegData(const QString &id, QByteArray &data)
+{
     QCborStreamWriter writer(&data);
     writer.startMap(3);
     writer.append("type");
@@ -16,7 +17,8 @@ void fillRegData(const QString& id, QByteArray& data) {
     writer.append("reg");
     writer.endArray();
 }
-void fillDeviceData(const QString& id, QByteArray& data) {
+void fillDeviceData(const QString &id, QByteArray &data)
+{
     QCborStreamWriter writer(&data);
     writer.startMap(4);
     writer.append("type");
@@ -29,7 +31,7 @@ void fillDeviceData(const QString& id, QByteArray& data) {
     writer.append(QDate::currentDate().day());
     writer.endArray();
 }
-}
+} // namespace
 
 Device::Device(QObject *parent)
     : QObject(parent)
