@@ -12,6 +12,7 @@ RootController::RootController(QObject *parent)
             &DeviceModel::modelChanged,
             this,
             &RootController::deviceModelChanged);
+    setDeviceId("UniqueID");
 }
 
 void RootController::findDevices()

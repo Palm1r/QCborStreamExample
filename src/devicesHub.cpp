@@ -43,6 +43,7 @@ void DevicesHub::sendBroadcastData(const QByteArray &data)
 
 void DevicesHub::acceptConnection(qintptr newSocket)
 {
+    auto reader = std::make_shared<QCborStreamReader>();
     auto in_socket = new QTcpSocket(this);
     in_socket->setSocketDescriptor(newSocket);
 
@@ -51,41 +52,42 @@ void DevicesHub::acceptConnection(qintptr newSocket)
     connect(in_socket, &QTcpSocket::errorOccurred, this, remove_socket);
     connect(in_socket, &QTcpSocket::disconnected, this, remove_socket);
 
-    connect(in_socket, &QTcpSocket::readyRead, this, [in_socket, this]() {
+    connect(in_socket, &QTcpSocket::readyRead, this, [in_socket, reader, this]() {
         DeviceInfo device;
         device.ip = in_socket->peerAddress();
 
-        QCborStreamReader reader(in_socket->readAll());
+        reader->addData(in_socket->readAll());
+        reader->reparse();
 
-        if (reader.lastError() != QCborError::NoError || !reader.isMap())
+        if (reader->lastError() != QCborError::NoError || !reader->isMap())
             return;
-        if (!reader.isLengthKnown())
+        if (!reader->isLengthKnown())
             return;
 
         QVariantMap map;
-        reader.enterContainer();
+        reader->enterContainer();
 
         int i = 0;
         QString key;
         QVariant value;
 
-        while (reader.lastError() == QCborError::NoError && reader.hasNext()) {
+        while (reader->lastError() == QCborError::NoError && reader->hasNext()) {
             if (i == 0) {
-                key = reader.readString().data;
+                key = reader->readString().data;
                 ++i;
             } else {
                 if (key == "data") {
-                    value = reader.toUnsignedInteger();
+                    value = reader->toUnsignedInteger();
                 } else {
-                    value = reader.readString().data;
+                    value = reader->readString().data;
                 }
                 map[key] = value;
                 i = 0;
             }
-            reader.next();
+            reader->next();
         }
         qDebug() << "get map" << map;
-        reader.leaveContainer();
+        reader->leaveContainer();
         if (map["type"] == "client" && map["command"] == "reg") {
             device.id = map["id"].toString();
             emit regNewDevice(device);
