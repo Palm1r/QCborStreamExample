@@ -9,38 +9,54 @@ Window {
     visible: true
     title: qsTr("Network Test Project")
 
-    Column {
-        anchors.fill: parent
-        spacing: 50
+    Row {
+        anchors.centerIn: parent
+        spacing: 20
 
-        Button {
-            width: parent.width / 6
-            height: width / 2
-            text: "find devices"
-            onClicked: {
-                RootController.findDevices()
-            }
+        HubButton {
+            buttonColor: "lightblue"
+            buttonText: "Start server"
+            onButtonClicked: RootController.findDevices()
         }
 
-        Rectangle {
-            width: 30
-            height: width
-            radius: width / 2
-            color: RootController.deviceType() === RootController.Server ?
-                       "blue" : "green"
-        }
-
-        ListView {
-            height: childrenRect.height
-            width: parent.width
-            model: RootController.deviceModel
-            spacing: 50
-            orientation: ListView.Vertical
-            delegate: Rectangle {
-                width: parent.width
-                height: 100
-                color: "red"
-            }
+        HubButton {
+            buttonColor: "lightgreen"
+            buttonText: "Start client"
         }
     }
+
+//    Column {
+//        anchors.fill: parent
+//        spacing: 50
+
+//        Button {
+//            width: parent.width / 6
+//            height: width / 2
+//            text: "find devices"
+//            onClicked: {
+//                RootController.findDevices()
+//            }
+//        }
+
+//        Rectangle {
+//            width: 30
+//            height: width
+//            radius: width / 2
+//            color: RootController.deviceType() === RootController.Server ?
+//                       "blue" : "green"
+//        }
+
+//        ListView {
+//            height: childrenRect.height
+//            width: parent.width
+//            model: RootController.deviceModel
+//            spacing: 50
+//            orientation: ListView.Vertical
+//            delegate: Rectangle {
+//                width: parent.width
+//                height: 100
+//                color: "red"
+//            }
+//        }
+//    }
 }

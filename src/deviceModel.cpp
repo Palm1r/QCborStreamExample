@@ -54,3 +54,14 @@ void DeviceModel::addDevice(DeviceInfo newDevice)
     m_deviceList.push_back({newDevice.id, newDevice.ip, newDevice.messageCount});
     endInsertRows();
 }
+
+void DeviceModel::addDeviceMessage(QString id)
+{
+    for (auto device : m_deviceList) {
+        if (device.id == id) {
+            device.messageCount++;
+            emit modelChanged();
+            return;
+        }
+    }
+}

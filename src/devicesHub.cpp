@@ -4,7 +4,8 @@
 #include <QCborStreamWriter>
 
 namespace {
-constexpr int broadcastPort = 45454;
+constexpr quint16 broadcastPort = 45454;
+constexpr quint16 tcpListenPort = 56666;
 }
 
 DevicesHub::DevicesHub(QObject *parent)
@@ -26,11 +27,13 @@ void DevicesHub::findDevices()
     QByteArray data;
     {
         QCborStreamWriter writer(&data);
-        writer.startMap(2);
+        writer.startMap(3);
         writer.append("type");
         writer.append("server");
         writer.append("command");
         writer.append("find");
+        writer.append("listenport");
+        writer.append(tcpListenPort);
         writer.endArray();
     }
     sendBroadcastData(data);
@@ -45,22 +48,20 @@ void DevicesHub::acceptConnection(qintptr newSocket)
 {
     auto in_socket = std::make_shared<QTcpSocket>();
     in_socket->setSocketDescriptor(newSocket);
-    qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
+//    qDebug() << "ip:port" << in_socket->peerAddress() << ":" << in_socket->peerPort();
 
     connect(in_socket.get(), &QTcpSocket::readyRead, this, [in_socket, this]() {
         DeviceInfo device;
-        device.id = "test"; /*in_socket->peerName();*/
+//        device.id = "test"; /*in_socket->peerName();*/
         device.ip = in_socket->peerAddress();
-        device.messageCount++;
+//        device.messageCount++;
 
-        auto bytearray = in_socket->readAll();
-        qDebug() << "get data" << bytearray;
+        QCborStreamReader reader(in_socket->readAll());
         in_socket->close();
 
-        QCborStreamReader reader(bytearray);
         if (reader.lastError() != QCborError::NoError || !reader.isMap())
             return;
-        if (!reader.isLengthKnown() || reader.length() != 3)
+        if (!reader.isLengthKnown())
             return;
 
         QVariantMap map;
@@ -68,7 +69,7 @@ void DevicesHub::acceptConnection(qintptr newSocket)
 
         int i = 0;
         QString key;
-        QString value;
+        QVariant value;
 
         while (reader.lastError() == QCborError::NoError && reader.hasNext()) {
             if (i == 0) {
@@ -81,6 +82,7 @@ void DevicesHub::acceptConnection(qintptr newSocket)
             }
             reader.next();
         }
+        qDebug() << "get map" << map;
         reader.leaveContainer();
         device.id = map["id"].toString();
         emit regNewDevice(device);

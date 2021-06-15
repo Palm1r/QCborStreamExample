@@ -25,6 +25,8 @@ public:
 
 public slots:
     void addDevice(DeviceInfo newDevice);
+    void addDeviceMessage(QString id);
+
 signals:
     void modelChanged();
 
