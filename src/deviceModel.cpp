@@ -42,7 +42,7 @@ QHash<int, QByteArray> DeviceModel::roleNames() const
     return roles;
 }
 
-void DeviceModel::addDevice(DeviceInfo newDevice)
+void DeviceModel::addDevice(const DeviceInfo &newDevice)
 {
     for (const auto &device : qAsConst(m_deviceList)) {
         if (device.id == newDevice.id) {
@@ -56,7 +56,7 @@ void DeviceModel::addDevice(DeviceInfo newDevice)
     endInsertRows();
 }
 
-void DeviceModel::addDeviceMessage(QString id)
+void DeviceModel::addDeviceMessage(const QString &id)
 {
     for (int i = 0; i < m_deviceList.size(); ++i) {
         if (m_deviceList.at(i).id == id) {

@@ -25,6 +25,11 @@ int RootController::deviceType()
     return m_type;
 }
 
+void RootController::setDeviceId(const QString &newId)
+{
+    m_device->setId(newId);
+}
+
 DeviceModel *RootController::deviceModel() const
 {
     return m_hub->deviceList().get();

@@ -1,8 +1,9 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <QCborStreamReader>
 #include <QObject>
+
+#include <QCborStreamReader>
 #include <QTcpSocket>
 #include <QTimer>
 #include <QUdpSocket>

@@ -35,12 +35,12 @@ public:
 
     void findDevices();
 
-    void sendBroadcastData(QByteArray data);
+    void sendBroadcastData(const QByteArray &data);
 
     const std::shared_ptr<DeviceModel> &deviceList() const;
 
 signals:
-    void regNewDevice(DeviceInfo info);
+    void regNewDevice(const DeviceInfo &info);
     void newMessageFrom(const QString &id);
 
 public slots:

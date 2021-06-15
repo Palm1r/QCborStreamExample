@@ -24,8 +24,8 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 public slots:
-    void addDevice(DeviceInfo newDevice);
-    void addDeviceMessage(QString id);
+    void addDevice(const DeviceInfo &newDevice);
+    void addDeviceMessage(const QString &id);
 
 signals:
     void modelChanged();

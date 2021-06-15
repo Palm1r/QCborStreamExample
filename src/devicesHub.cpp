@@ -1,5 +1,6 @@
 #include "devicesHub.h"
 
+#include <memory>
 #include <QCborStreamReader>
 #include <QCborStreamWriter>
 
@@ -30,27 +31,31 @@ void DevicesHub::findDevices()
         writer.append("find");
         writer.append("listenport");
         writer.append(tcpListenPort);
-        writer.endArray();
+        writer.endMap();
     }
     sendBroadcastData(data);
 }
 
-void DevicesHub::sendBroadcastData(QByteArray data)
+void DevicesHub::sendBroadcastData(const QByteArray &data)
 {
     m_udpSocket->writeDatagram(data, QHostAddress::Broadcast, broadcastPort);
 }
 
 void DevicesHub::acceptConnection(qintptr newSocket)
 {
-    auto in_socket = std::make_shared<QTcpSocket>();
+    auto in_socket = new QTcpSocket(this);
     in_socket->setSocketDescriptor(newSocket);
 
-    connect(in_socket.get(), &QTcpSocket::readyRead, this, [in_socket, this]() {
+    auto remove_socket = [in_socket]() { in_socket->deleteLater(); };
+
+    connect(in_socket, &QTcpSocket::errorOccurred, this, remove_socket);
+    connect(in_socket, &QTcpSocket::disconnected, this, remove_socket);
+
+    connect(in_socket, &QTcpSocket::readyRead, this, [in_socket, this]() {
         DeviceInfo device;
         device.ip = in_socket->peerAddress();
 
         QCborStreamReader reader(in_socket->readAll());
-        in_socket->close();
 
         if (reader.lastError() != QCborError::NoError || !reader.isMap())
             return;
@@ -88,6 +93,7 @@ void DevicesHub::acceptConnection(qintptr newSocket)
         if (map["type"] == "client" && map["command"] == "deviceData") {
             emit newMessageFrom(map["id"].toString());
         }
+        in_socket->close();
     });
 }
 

@@ -22,6 +22,20 @@ Window {
         HubButton {
             buttonColor: "lightgreen"
             buttonText: "Start client"
+
+            TextField {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    bottom: parent.bottom
+                }
+
+                horizontalAlignment: TextInput.AlignHCenter
+                placeholderText: qsTr("Enter id")
+                text: "UniqueID"
+                onTextChanged: {
+                    RootController.setDeviceId(text)
+                }
+            }
         }
     }
 

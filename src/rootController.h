@@ -23,6 +23,7 @@ public:
 public slots:
     void findDevices();
     int deviceType();
+    void setDeviceId(const QString &newId);
 
 signals:
     void deviceModelChanged();

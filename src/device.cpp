@@ -2,6 +2,7 @@
 
 #include <QCborStreamWriter>
 #include <QDate>
+
 namespace {
 constexpr int udpSocketPort = 45454;
 
@@ -15,7 +16,7 @@ void fillRegData(const QString &id, QByteArray &data)
     writer.append(id);
     writer.append("command");
     writer.append("reg");
-    writer.endArray();
+    writer.endMap();
 }
 void fillDeviceData(const QString &id, QByteArray &data)
 {
@@ -29,7 +30,7 @@ void fillDeviceData(const QString &id, QByteArray &data)
     writer.append("deviceData");
     writer.append("data");
     writer.append(QDate::currentDate().day());
-    writer.endArray();
+    writer.endMap();
 }
 } // namespace
 
@@ -40,7 +41,7 @@ Device::Device(QObject *parent)
 {
     m_listenSocket->bind(udpSocketPort, QUdpSocket::ShareAddress);
     connect(m_listenSocket.get(), &QUdpSocket::readyRead, this, &Device::readBroadcastData);
-    connect(m_clientTcpSocket.get(), &QAbstractSocket::connected, [this]() {
+    connect(m_clientTcpSocket.get(), &QAbstractSocket::connected, this, [this]() {
         qDebug() << "client connected";
         QByteArray data;
         if (m_deviceState == DeviceState::Registration) {
@@ -73,10 +74,14 @@ void Device::readBroadcastData()
 
         m_cborReader = std::make_unique<QCborStreamReader>(data);
 
-        if (m_cborReader->lastError() != QCborError::NoError || !m_cborReader->isMap())
+        if (m_cborReader->lastError() != QCborError::NoError || !m_cborReader->isMap()) {
+            qWarning("datastream no valid");
             continue;
-        if (!m_cborReader->isLengthKnown() || m_cborReader->length() != 3)
+        }
+        if (!m_cborReader->isLengthKnown() || m_cborReader->length() != 3) {
+            qWarning("datastream length unknown");
             continue;
+        }
 
         QVariantMap map;
         m_cborReader->enterContainer();
