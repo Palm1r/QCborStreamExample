@@ -1,4 +1,4 @@
-# NetworkTestProject
+# QCborStreamExample
 
 A test project in which there is one server and clients connected to it.
 
