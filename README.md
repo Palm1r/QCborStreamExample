@@ -2,6 +2,10 @@
 
 A test project in which there is one server and clients connected to it.
 
+How it works:
+
+![Image alt](https://github.com/Palm1r/QCborStreamExample/blob/master/QCborStreamExample.jpg)
+
 How to use:
 Windows:
 1) Clone repo
