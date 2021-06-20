@@ -13,7 +13,7 @@ Windows:
 
 Linux
 1) Clone repo
-2) Build with Qt 5.15.2 and mingw 8.1
+2) Build with Qt 5.15.2 and gcc > 8.1
 3) Run application
 4) Edit client id
 ... Run application on any devices
@@ -22,3 +22,4 @@ Linux
 used tools
 Qt 5.15.2
 mingw 8.1
+gcc 9.2
