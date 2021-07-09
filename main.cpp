@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
                                              1,
                                              0,
                                              "RootController",
-                                             [](QQmlEngine *, QJSEngine *) {
-                                                 auto rootController = new RootController();
+                                             [](QQmlEngine *engine, QJSEngine *) {
+                                                 auto rootController = new RootController(engine);
                                                  return rootController;
                                              });
     engine.load(url);
